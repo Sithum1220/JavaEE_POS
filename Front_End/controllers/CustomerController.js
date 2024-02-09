@@ -21,88 +21,152 @@ function getAllCustomerForTextFeild() {
 }
 
 S('#btn-save').click(function () {
-    if (checkAll()) {
-        saveCustomer();
-    } else {
-        alert("Error");
+    // if (checkAll()) {
+    //     saveCustomer();
+    // } else {
+    //     alert("Error");
+    // }
+let data = S('#formData').serialize();
+let id = S('#customerId').val();
+let mobile = S('#customerMobile').val();
+let nic = S('#customerNIC').val();
+console.log(id)
+console.log("Method Run")
+S.ajax({
+    url:"http://localhost:8080/app/customer",
+    method:"POST",
+    data:data,
+    success: function (resp) {
+        if (resp.status === 200) {
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: 'Customer has been saved',
+                showConfirmButton: false,
+                timer: 2500
+            })
+        }else if (resp.status === 500 && resp.data.startsWith("Duplicate entry "+"'"+id+"'")){
+            Swal.fire({
+                position: 'top-end',
+                icon: 'warning',
+                title: 'Customer has been Already Exist',
+                showConfirmButton: false,
+                timer: 2500
+            })
+        }else if (resp.status === 500 && resp.data.startsWith("Duplicate entry "+"'"+mobile+"'")){
+            Swal.fire({
+                position: 'top-end',
+                icon: 'warning',
+                title: 'Mobile Number has been Already Exist',
+                showConfirmButton: false,
+                timer: 2500
+            })
+        }else if (resp.status === 500 && resp.data.startsWith("Duplicate entry "+"'"+nic+"'")){
+            Swal.fire({
+                position: 'top-end',
+                icon: 'warning',
+                title: 'NIC has been Already Exist',
+                showConfirmButton: false,
+                timer: 2500
+            })
+        }else {
+            Swal.fire({
+                position: 'top-end',
+                icon: 'warning',
+                title: 'Customer Not saved. Please Try Again',
+                showConfirmButton: false,
+                timer: 2500
+            })
+        }
+    },
+    error:function (resp) {
+        Swal.fire({
+            position: 'top-end',
+            icon: 'warning',
+            title: 'Customer Not saved. Please Try Again',
+            showConfirmButton: false,
+            timer: 2500
+        })
     }
+
+})
 });
 
-function saveCustomer() {
-    getAllCustomerForTextFeild();
-    let customerIds = S('#customerId').val();
-    if (searchExistCustomer(customerIds.trim())) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'This Customer Already Exist.'
-        });
-    } else {
-        let mobileNum = S('#customerMobile').val();
-        if (searchExistCustomerMobile(mobileNum.trim())){
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'This Customer Mobile Number Already Exist.'
-            });
-        }else {
-            let nic = S('#customerNIC').val();
+// function saveCustomer() {
+//     getAllCustomerForTextFeild();
+//     let customerIds = S('#customerId').val();
+//     if (searchExistCustomer(customerIds.trim())) {
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Oops...',
+//             text: 'This Customer Already Exist.'
+//         });
+//     } else {
+//         let mobileNum = S('#customerMobile').val();
+//         if (searchExistCustomerMobile(mobileNum.trim())){
+//             Swal.fire({
+//                 icon: 'error',
+//                 title: 'Oops...',
+//                 text: 'This Customer Mobile Number Already Exist.'
+//             });
+//         }else {
+//             let nic = S('#customerNIC').val();
+//
+//             if (searchExistCustomerNIC(nic.trim())){
+//                 Swal.fire({
+//                     icon: 'error',
+//                     title: 'Oops...',
+//                     text: 'This Customer NIC Already Exist.'
+//                 });
+//             }else {
+//                 let newCustomer = Object.assign({}, customer);
+//
+//                 newCustomer.id = customerId;
+//                 newCustomer.name = customerName;
+//
+//                 newCustomer.mobile = customerMobile;
+//                 newCustomer.nic = customerNIC;
+//                 newCustomer.address = customerStreet + ", " + customerCity;
+//
+//                 customerDB.push(newCustomer);
+//
+//                 Swal.fire({
+//                     position: 'top-end',
+//                     icon: 'success',
+//                     title: 'Customer has been saved',
+//                     showConfirmButton: false,
+//                     timer: 1500
+//                 })
+//
+//                 loadDataTable();
+//                 clearCustomerInputFields();
+//                 setDataTableToTextFeild();
+//                 doubleClick();
+//                 setCustomerId();
+//                 S('#search').val("");
+//             }
+//         }
+//
+//     }
+// }
 
-            if (searchExistCustomerNIC(nic.trim())){
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'This Customer NIC Already Exist.'
-                });
-            }else {
-                let newCustomer = Object.assign({}, customer);
+// function searchExistCustomer(id) {
+//     return customerDB.find(function (customer) {
+//         return customer.id == id;
+//     });
+// }
 
-                newCustomer.id = customerId;
-                newCustomer.name = customerName;
-
-                newCustomer.mobile = customerMobile;
-                newCustomer.nic = customerNIC;
-                newCustomer.address = customerStreet + ", " + customerCity;
-
-                customerDB.push(newCustomer);
-
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Customer has been saved',
-                    showConfirmButton: false,
-                    timer: 1500
-                })
-
-                loadDataTable();
-                clearCustomerInputFields();
-                setDataTableToTextFeild();
-                doubleClick();
-                setCustomerId();
-                S('#search').val("");
-            }
-        }
-
-    }
-}
-
-function searchExistCustomer(id) {
-    return customerDB.find(function (customer) {
-        return customer.id == id;
-    });
-}
-
-function searchExistCustomerMobile(mobile) {
-    return customerDB.find(function (customer) {
-        return customer.mobile == mobile;
-    });
-}
-
-function searchExistCustomerNIC(nic) {
-    return customerDB.find(function (customer) {
-        return customer.nic == nic;
-    });
-}
+// function searchExistCustomerMobile(mobile) {
+//     return customerDB.find(function (customer) {
+//         return customer.mobile == mobile;
+//     });
+// }
+//
+// function searchExistCustomerNIC(nic) {
+//     return customerDB.find(function (customer) {
+//         return customer.nic == nic;
+//     });
+// }
 
 function loadDataTable() {
     S('#tBody').empty();
