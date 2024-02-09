@@ -33,4 +33,14 @@ public class CustomerDAOimpl implements CustomerDAO {
         }
         return allCustomers;
     }
+
+    @Override
+    public boolean update(Customer entity, Connection connection) throws SQLException {
+        System.out.println(entity.getCity());
+        System.out.println(entity.getId());
+        System.out.println(entity.getNic());
+        System.out.println(entity.getStreet());
+        return connection.createStatement().executeUpdate("UPDATE customer SET  name='"+entity.getName()+"',mobile='"+entity.getMobile()+"',nic='"+entity.getNic()+"',city='"+entity.getCity()+"',street='"+entity.getStreet()+"' WHERE id='"+entity.getId()+"'")>0;
+
+    }
 }

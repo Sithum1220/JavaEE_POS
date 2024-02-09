@@ -10,6 +10,7 @@ S(window).on('load', function () {
     S("#btn-update").prop("disabled", true);
     S("#btn-delete").prop("disabled", true);
     loadDataTable();
+    setDataTableToTextFeild();
 });
 
 function getAllCustomerForTextFeild() {
@@ -183,6 +184,7 @@ function loadDataTable() {
                 console.log(customer.street)
                 var row = `<tr><td>${customer.id}</td><td>${customer.name}</td><td>${customer.street+", "+customer.city}</td><td>${customer.mobile}</td><td>${customer.nic}</td></tr>`;
                 S('#tBody').append(row)
+                setDataTableToTextFeild();
             }
         }
     })
@@ -221,11 +223,84 @@ function setDataTableToTextFeild() {
 
 S('#btn-update').click(function () {
 
-    if (checkAll()) {
-        updateCustomer();
-    } else {
-        alert('error');
+    // if (checkAll()) {
+    //     updateCustomer();
+    // } else {
+    //     alert('error');
+    // }
+    var cusOB = {
+        id:S('#customerId').val(),
+        name:S('#customerName').val(),
+        mobile:S('#customerMobile').val(),
+        nic:S('#customerNIC').val(),
+        city:S('#customerCity').val(),
+        street:S('#customerStreet').val(),
     }
+    let data = S('#formData').serialize();
+    let id = S('#customerId').val();
+    let mobile = S('#customerMobile').val();
+    let nic = S('#customerNIC').val();
+    console.log(data)
+    S.ajax({
+        url: "http://localhost:8080/app/customer",
+        method: "PUT",
+        contentType: "application/json",
+        data:JSON.stringify(cusOB),
+        success: function (resp) {
+            if (resp.status === 200) {
+                loadDataTable();
+                clearCustomerInputFields();
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Customer has been Updated!',
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+                // }else if (resp.status === 500 && resp.data.startsWith("Duplicate entry "+"'"+id+"'")){
+                //     Swal.fire({
+                //         position: 'top-end',
+                //         icon: 'warning',
+                //         title: 'Customer has been Already Exist',
+                //         showConfirmButton: false,
+                //         timer: 2500
+                //     })
+            } else if (resp.status === 500 && resp.data.startsWith("Duplicate entry " + "'" + mobile + "'")) {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'Mobile Number has been Already Exist',
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+            } else if (resp.status === 500 && resp.data.startsWith("Duplicate entry " + "'" + nic + "'")) {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'NIC has been Already Exist',
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+            } else {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'Customer Not saved. Please Try Again',
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+            }
+        },
+        error: function (resp) {
+            Swal.fire({
+                position: 'top-end',
+                icon: 'warning',
+                title: 'Customer Not saved. Please Try Again',
+                showConfirmButton: false,
+                timer: 2500
+            })
+        }
+    });
 });
 
 function updateCustomer() {

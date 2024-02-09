@@ -1,8 +1,6 @@
 package lk.ijse.gdse66.javaee_pos.servlet;
 
-import jakarta.json.Json;
-import jakarta.json.JsonArrayBuilder;
-import jakarta.json.JsonObjectBuilder;
+import jakarta.json.*;
 import lk.ijse.gdse66.javaee_pos.bo.BOFactory;
 import lk.ijse.gdse66.javaee_pos.bo.CustomerBO;
 import lk.ijse.gdse66.javaee_pos.dto.CustomerDTO;
@@ -25,6 +23,7 @@ import java.util.ArrayList;
 public class CustomerServlet extends HttpServlet {
 
     CustomerBO customerBO = (CustomerBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CUSTOMER);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try (Connection connection = customerBO.pool(req).getConnection();) {
@@ -44,8 +43,7 @@ public class CustomerServlet extends HttpServlet {
 
             //create the response Object
 //            resp.getWriter().print(ResponseUtil.genJson("Success", "Loaded", allCustomers.build()));
-            PrintWriter writer = resp.getWriter();
-            writer.print(allCustomers.build());
+            ResponseUtil.genJson("Success",200,resp,allCustomers);
 
         } catch (SQLException e) {
             resp.setStatus(500);
@@ -64,24 +62,50 @@ public class CustomerServlet extends HttpServlet {
         String street = req.getParameter("street");
         resp.setContentType("application/json");
 
-        try (Connection connection = customerBO.pool(req).getConnection()){
+        try (Connection connection = customerBO.pool(req).getConnection()) {
 
-            customerBO.addCustomer(new CustomerDTO(id,name,mobile,nic,city,street),connection);
-            resp.setStatus(HttpServletResponse.SC_OK);
-            PrintWriter writer = resp.getWriter();
-            writer.print(ResponseUtil.genJson("Success",200).build());
-
+            customerBO.addCustomer(new CustomerDTO(id, name, mobile, nic, city, street), connection);
+//            PrintWriter writer = resp.getWriter();
+//            writer.print(ResponseUtil.genJson("Success",200).build();
+            ResponseUtil.genJson("Success", 200, resp);
         } catch (SQLException e) {
-            resp.setStatus(HttpServletResponse.SC_OK);
-            PrintWriter writer = resp.getWriter();
-            writer.print(ResponseUtil.genJson("Error",500,e).build());
+//            PrintWriter writer = resp.getWriter();
+//            writer.print(ResponseUtil.genJson("Error", 500, e).build());
+            ResponseUtil.genJson("Success", 200,e, resp);
+
 //            resp.getWriter().print(ResponseUtil.genJson("Error", e.getMessage()));
         }
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("PUT");
+        JsonReader reader = Json.createReader(req.getReader());
+        JsonObject jsonObject = reader.readObject();
+        String id = jsonObject.getString("id");
+        String name = jsonObject.getString("name");
+        String mobile = jsonObject.getString("mobile");
+        String nic = jsonObject.getString("nic");
+        String city = jsonObject.getString("city");
+        String street = jsonObject.getString("street");
+//        resp.addHeader("Access-Control-Allow-Origin", "*");
+        resp.setContentType("application/json");
 
+        System.out.println(id+name+mobile+nic+city+street);
+        try (Connection connection = customerBO.pool(req).getConnection();) {
+
+            boolean isUpdated = customerBO.updateCustomer(new CustomerDTO(id, name, mobile, nic,city,street), connection);
+            if (isUpdated) {
+                System.out.println(isUpdated);
+               ResponseUtil.genJson("Success",200,resp);
+            } else {
+                System.out.println(isUpdated);
+                ResponseUtil.genJson("Error",500,resp);
+            }
+
+        } catch (SQLException e) {
+            ResponseUtil.genJson("Error",500,e,resp);
+        }
     }
 
     @Override

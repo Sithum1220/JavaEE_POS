@@ -8,4 +8,7 @@ public interface CrudDAO<T> extends SuperDAO{
 
      boolean add(T entity, Connection connection) throws SQLException;
      ArrayList<T> getAll(Connection connection) throws SQLException;
+
+     public boolean update(T entity, Connection connection) throws SQLException;
+
 }

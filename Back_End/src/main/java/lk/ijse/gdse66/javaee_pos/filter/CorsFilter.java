@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebFilter(urlPatterns = "/*", filterName = "B")
+@WebFilter(urlPatterns = "/*", filterName = "customerFilter")
 public class CorsFilter implements Filter {
 
 
@@ -34,10 +34,11 @@ public class CorsFilter implements Filter {
         if (method.equals("OPTIONS")){
             //we can append those headers to the response before it is
             //send back to the client
+            System.out.println("Filter");
             res.setStatus(200);
             res.addHeader("Access-Control-Allow-Origin", "*");
             res.addHeader("Access-Control-Allow-Methods", "PUT, DELETE");
-            res.addHeader("Access-Control-Allow-Headers", "content-type,auth");
+            res.addHeader("Access-Control-Allow-Headers", "content-type");
         }else{
             //otherwise if it is a GET,POST,PUT or DELETE we can append the
             //following common header

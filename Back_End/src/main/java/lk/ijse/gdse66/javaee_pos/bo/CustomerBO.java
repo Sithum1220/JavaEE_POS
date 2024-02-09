@@ -16,4 +16,6 @@ public interface CustomerBO extends SuperBO{
 
     public ArrayList<CustomerDTO> getAllCustomers(Connection connection) throws SQLException;
 
+    public boolean updateCustomer(CustomerDTO dto,Connection connection) throws SQLException;
+
 }
