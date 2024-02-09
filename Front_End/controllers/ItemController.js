@@ -172,11 +172,11 @@ S('#btn-update-item').click(function () {
     // }
 
     var itemOB = {
-        itemId: S('#itemId').val(),
-        itemCategory: S('#itemCategory').val(),
-        itemUnitPrice: S('#itemUnitPrice').val(),
-        itemQTY: S('#itemQTY').val(),
-        itemDescription: S('#itemDescription').val(),
+        id: S('#itemId').val(),
+        category: S('#itemCategory').val(),
+        unitPrice: S('#itemUnitPrice').val(),
+        qty: S('#itemQTY').val(),
+        description: S('#itemDescription').val(),
     }
     // let data = S('#formData').serialize();
     let itemId = S('#itemId').val();

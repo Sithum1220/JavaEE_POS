@@ -241,7 +241,7 @@ S('#btn-update').click(function () {
     let id = S('#customerId').val();
     let mobile = S('#customerMobile').val();
     let nic = S('#customerNIC').val();
-    console.log(data)
+    // console.log(data)
     S.ajax({
         url: "http://localhost:8080/app/customer",
         method: "PUT",

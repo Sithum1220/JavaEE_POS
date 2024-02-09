@@ -92,7 +92,7 @@ public class CustomerServlet extends HttpServlet {
         String city = jsonObject.getString("city");
         String street = jsonObject.getString("street");
 //        resp.addHeader("Access-Control-Allow-Origin", "*");
-        resp.setContentType("applicatiodn/json");
+        resp.setContentType("application/json");
 
         System.out.println(id + name + mobile + nic + city + street);
         try (Connection connection = PoolUtil.pool(req).getConnection();) {

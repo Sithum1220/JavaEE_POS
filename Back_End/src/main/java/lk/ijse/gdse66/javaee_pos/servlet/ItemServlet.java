@@ -57,6 +57,7 @@ public class ItemServlet extends HttpServlet {
         String description = req.getParameter("description");
         resp.setContentType("application/json");
 
+
         try (Connection connection = PoolUtil.pool(req).getConnection()) {
 
             itemBO.addItem(new ItemDTO(id, category, unitPrice, qty, description), connection);
