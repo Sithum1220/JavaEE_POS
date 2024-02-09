@@ -6,7 +6,9 @@ import lk.ijse.gdse66.javaee_pos.entity.Customer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class CustomerDAOimpl implements CustomerDAO {
     @Override
@@ -15,5 +17,20 @@ public class CustomerDAOimpl implements CustomerDAO {
                 ("INSERT INTO customer VALUES ('" + entity.getId() + "','" + entity.getName() + "','" +
                         entity.getMobile() + "','" + entity.getNic() + "','"+entity.getCity()+"'," +
                         "'"+entity.getStreet()+"')")>0;
+    }
+
+    @Override
+    public ArrayList<Customer> getAll(Connection connection) throws SQLException {
+        ArrayList<Customer> allCustomers = new ArrayList<>();
+        ResultSet resultSet = connection.createStatement().executeQuery("Select * from customer");
+
+        while (resultSet.next()) {
+            Customer customer = new Customer(resultSet.getString("id"),
+                    resultSet.getString("name"), resultSet.getString("mobile"),
+                    resultSet.getString("nic"),resultSet.getString("city"),
+                    resultSet.getString("street"));
+            allCustomers.add(customer);
+        }
+        return allCustomers;
     }
 }

@@ -12,6 +12,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class CustomerBOimpl implements CustomerBO {
 
@@ -29,5 +30,16 @@ public class CustomerBOimpl implements CustomerBO {
         BasicDataSource pool = (BasicDataSource) servletContext.getAttribute("pos");
 
         return pool;
+    }
+
+    @Override
+    public ArrayList<CustomerDTO> getAllCustomers(Connection connection) throws SQLException {
+        ArrayList<CustomerDTO> allCustomers = new ArrayList<>();
+
+        ArrayList<Customer> allEntity = customerDAO.getAll(connection);
+        for (Customer c : allEntity) {
+            allCustomers.add(new CustomerDTO(c.getId(),c.getName(),c.getMobile(),c.getNic(),c.getCity(),c.getStreet()));
+        }
+        return allCustomers;
     }
 }

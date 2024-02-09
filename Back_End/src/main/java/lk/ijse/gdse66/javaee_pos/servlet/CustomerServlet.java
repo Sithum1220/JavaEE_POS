@@ -1,5 +1,8 @@
 package lk.ijse.gdse66.javaee_pos.servlet;
 
+import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObjectBuilder;
 import lk.ijse.gdse66.javaee_pos.bo.BOFactory;
 import lk.ijse.gdse66.javaee_pos.bo.CustomerBO;
 import lk.ijse.gdse66.javaee_pos.dto.CustomerDTO;
@@ -16,6 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 @WebServlet(urlPatterns = "/customer")
 public class CustomerServlet extends HttpServlet {
@@ -23,7 +27,30 @@ public class CustomerServlet extends HttpServlet {
     CustomerBO customerBO = (CustomerBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CUSTOMER);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("hey doGet");
+        try (Connection connection = customerBO.pool(req).getConnection();) {
+            ArrayList<CustomerDTO> customers = customerBO.getAllCustomers(connection);
+            JsonArrayBuilder allCustomers = Json.createArrayBuilder();
+            for (CustomerDTO dto : customers) {
+                JsonObjectBuilder builder = Json.createObjectBuilder();
+                builder.add("id", dto.getId());
+                builder.add("name", dto.getName());
+                builder.add("mobile", dto.getMobile());
+                builder.add("nic", dto.getNic());
+                builder.add("city", dto.getCity());
+                builder.add("street", dto.getStreet());
+                allCustomers.add(builder.build());
+                System.out.println(dto.getNic());
+            }
+
+            //create the response Object
+//            resp.getWriter().print(ResponseUtil.genJson("Success", "Loaded", allCustomers.build()));
+            PrintWriter writer = resp.getWriter();
+            writer.print(allCustomers.build());
+
+        } catch (SQLException e) {
+            resp.setStatus(500);
+//            resp.getWriter().print(ResponseUtil.genJson("Error", e.getMessage()));
+        }
     }
 
     @Override

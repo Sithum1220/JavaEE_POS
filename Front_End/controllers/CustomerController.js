@@ -9,6 +9,7 @@ let selectedId;
 S(window).on('load', function () {
     S("#btn-update").prop("disabled", true);
     S("#btn-delete").prop("disabled", true);
+    loadDataTable();
 });
 
 function getAllCustomerForTextFeild() {
@@ -38,6 +39,8 @@ S.ajax({
     data:data,
     success: function (resp) {
         if (resp.status === 200) {
+            loadDataTable();
+            clearCustomerInputFields();
             Swal.fire({
                 position: 'top-end',
                 icon: 'success',
@@ -170,10 +173,19 @@ S.ajax({
 
 function loadDataTable() {
     S('#tBody').empty();
-    for (var customer of customerDB) {
-        var row = `<tr><td>${customer.id}</td><td>${customer.name}</td><td>${customer.address}</td><td>${customer.mobile}</td><td>${customer.nic}</td></tr>`;
-        S('#tBody').append(row)
-    }
+    S.ajax({
+        url: "http://localhost:8080/app/customer",
+        method: "GET",
+        dataType:"json",
+        success: function (resp) {
+            console.log(resp)
+            for (var customer of resp) {
+                console.log(customer.street)
+                var row = `<tr><td>${customer.id}</td><td>${customer.name}</td><td>${customer.street+", "+customer.city}</td><td>${customer.mobile}</td><td>${customer.nic}</td></tr>`;
+                S('#tBody').append(row)
+            }
+        }
+    })
 }
 
 function setDataTextFeild(id, name, mobile, nic, city, street) {
