@@ -8,6 +8,7 @@ let selectedItemId;
 S(window).on('load', function () {
     S("#btn-update-item").prop("disabled", true);
     S("#btn-delete-item").prop("disabled", true);
+    loadItemDataTable();
 });
 
 function getAllItemForTextFeild() {
@@ -18,51 +19,98 @@ function getAllItemForTextFeild() {
     itemDescription = S('#itemDescription').val();
 }
 S('#btn-save-item').click(function () {
-    if (checkAllItemReg()) {
-        saveItem();
-    } else {
-        alert("Error");
-    }
+    // if (checkAllItemReg()) {
+    //     saveItem();
+    // } else {
+    //     alert("Error");
+    // }
+
+    let data = S('#itemFormData').serialize();
+    let id = S('#itemId').val();
+    S.ajax({
+        url:"http://localhost:8080/app/item",
+        method:"POST",
+        data:data,
+        success: function (resp) {
+            if (resp.status === 200) {
+                loadItemDataTable();
+                clearItemInputFields();
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Item has been saved',
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+            }else if (resp.status === 500 && resp.data.startsWith("Duplicate entry "+"'"+id+"'")){
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'Item has been Already Exist',
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+            }else {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'Item Not saved. Please Try Again',
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+            }
+        },
+        error:function (resp) {
+            Swal.fire({
+                position: 'top-end',
+                icon: 'warning',
+                title: 'Item Not saved. Please Try Again',
+                showConfirmButton: false,
+                timer: 2500
+            })
+        }
+
+    })
 });
 
 
-function saveItem() {
-    getAllItemForTextFeild();
-    let itemIds = S('#itemId').val();
-    if (searchExistItem(itemIds.trim())) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'This Item Already Exist.'
-        });
-    } else {
-        let newItem = Object.assign({}, item);
-
-        newItem.id = itemId;
-        newItem.category = itemCategory;
-
-        newItem.qty = itemQTY;
-        newItem.unitPrice = itemUnitPrice;
-        newItem.description = itemDescription;
-
-        itemDB.push(newItem);
-
-        Swal.fire({
-            position: 'top-end',
-            icon: 'success',
-            title: 'Item has been saved',
-            showConfirmButton: false,
-            timer: 1500
-        })
-
-        loadItemDataTable();
-        clearItemInputFields();
-        setItemDataTableToTextFeild();
-        itemRowdoubleClick();
-        setItemId();
-        S('#search').val("");
-    }
-}
+// function saveItem() {
+//     getAllItemForTextFeild();
+//     let itemIds = S('#itemId').val();
+//     if (searchExistItem(itemIds.trim())) {
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Oops...',
+//             text: 'This Item Already Exist.'
+//         });
+//     } else {
+//         let newItem = Object.assign({}, item);
+//
+//         newItem.id = itemId;
+//         newItem.category = itemCategory;
+//
+//         newItem.qty = itemQTY;
+//         newItem.unitPrice = itemUnitPrice;
+//         newItem.description = itemDescription;
+//
+//         itemDB.push(newItem);
+//
+//         Swal.fire({
+//             position: 'top-end',
+//             icon: 'success',
+//             title: 'Item has been saved',
+//             showConfirmButton: false,
+//             timer: 1500
+//         })
+//
+//         loadItemDataTable();
+//         clearItemInputFields();
+//         setItemDataTableToTextFeild();
+//         itemRowdoubleClick();
+//         setItemId();
+//         S('#search').val("");
+//     }
+// }
 
 function searchExistItem(id) {
     return itemDB.find(function (item) {
@@ -72,10 +120,19 @@ function searchExistItem(id) {
 
 function loadItemDataTable() {
     S('#tBody-item').empty();
-    for (var item of itemDB) {
-        var row = `<tr><td>${item.id}</td><td>${item.description}</td><td>${item.category}</td><td>${item.unitPrice}</td><td>${item.qty}</td></tr>`;
-        S('#tBody-item').append(row)
-    }
+    S('#tBody').empty();
+    S.ajax({
+        url: "http://localhost:8080/app/item",
+        method: "GET",
+        dataType: "json",
+        success: function (resp) {
+            for (var item of resp) {
+                var row = `<tr><td>${item.id}</td><td>${item.description}</td><td>${item.category}</td><td>${item.unitPrice}</td><td>${item.qty}</td></tr>`;
+                S('#tBody-item').append(row)
+            }
+        }
+
+    });
 }
 
 function setItemDataTextFeild(id, description, category, unitPrice, qty) {

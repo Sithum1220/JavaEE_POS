@@ -1,6 +1,7 @@
 package lk.ijse.gdse66.javaee_pos.bo;
 
 import lk.ijse.gdse66.javaee_pos.bo.custom.CustomerBOimpl;
+import lk.ijse.gdse66.javaee_pos.bo.custom.ItemBOimpl;
 
 public class BOFactory {
     private static BOFactory boFactory;
@@ -17,8 +18,8 @@ public class BOFactory {
         switch (types) {
             case CUSTOMER:
                 return new CustomerBOimpl();
-//            case ITEM:
-//                return new ItemBOimpl();
+            case ITEM:
+                return new ItemBOimpl();
 //            case PLACEORDER:
 //                return new PurchaseOrederBOimpl();
             default:

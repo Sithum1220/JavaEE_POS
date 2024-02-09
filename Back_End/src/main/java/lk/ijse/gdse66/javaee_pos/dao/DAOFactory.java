@@ -2,6 +2,7 @@ package lk.ijse.gdse66.javaee_pos.dao;
 
 
 import lk.ijse.gdse66.javaee_pos.dao.custom.CustomerDAOimpl;
+import lk.ijse.gdse66.javaee_pos.dao.custom.ItemDAOimpl;
 
 public class DAOFactory {
     private static DAOFactory daoFactory;
@@ -18,8 +19,8 @@ public class DAOFactory {
         switch (types) {
             case CUSTOMER:
                 return new CustomerDAOimpl();
-//            case ITEM:
-//                return new ItemDAOimpl();
+            case ITEM:
+                return new ItemDAOimpl();
 //            case PLACEORDER:
 //                return new PurchaseOrederBOimpl();
             default:

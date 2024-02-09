@@ -20,17 +20,18 @@ public class CustomerBOimpl implements CustomerBO {
     @Override
     public boolean addCustomer(CustomerDTO dto, Connection connection) throws SQLException {
 
-        return customerDAO.add(new Customer(dto.getId(), dto.getName(), dto.getMobile(), dto.getNic(), dto.getCity(),dto.getStreet()),connection);
+        return customerDAO.add(new Customer(dto.getId(), dto.getName(), dto.getMobile(), dto.getNic(), dto.getCity(),
+                dto.getStreet()),connection);
     }
 
-    @Override
-    public BasicDataSource pool(HttpServletRequest req) {
-        ServletContext servletContext = req.getServletContext();
-
-        BasicDataSource pool = (BasicDataSource) servletContext.getAttribute("pos");
-
-        return pool;
-    }
+//    @Override
+//    public BasicDataSource pool(HttpServletRequest req) {
+//        ServletContext servletContext = req.getServletContext();
+//
+//        BasicDataSource pool = (BasicDataSource) servletContext.getAttribute("pos");
+//
+//        return pool;
+//    }
 
     @Override
     public ArrayList<CustomerDTO> getAllCustomers(Connection connection) throws SQLException {

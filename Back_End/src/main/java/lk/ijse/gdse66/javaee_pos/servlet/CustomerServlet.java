@@ -4,6 +4,7 @@ import jakarta.json.*;
 import lk.ijse.gdse66.javaee_pos.bo.BOFactory;
 import lk.ijse.gdse66.javaee_pos.bo.CustomerBO;
 import lk.ijse.gdse66.javaee_pos.dto.CustomerDTO;
+import lk.ijse.gdse66.javaee_pos.util.PoolUtil;
 import lk.ijse.gdse66.javaee_pos.util.ResponseUtil;
 import org.apache.commons.dbcp2.BasicDataSource;
 
@@ -26,7 +27,7 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try (Connection connection = customerBO.pool(req).getConnection();) {
+        try (Connection connection = PoolUtil.pool(req).getConnection();) {
             ArrayList<CustomerDTO> customers = customerBO.getAllCustomers(connection);
             JsonArrayBuilder allCustomers = Json.createArrayBuilder();
             for (CustomerDTO dto : customers) {
@@ -46,8 +47,10 @@ public class CustomerServlet extends HttpServlet {
             ResponseUtil.genJson("Success", 200, resp, allCustomers);
 
         } catch (SQLException e) {
-            resp.setStatus(500);
+//            resp.setStatus(500);
 //            resp.getWriter().print(ResponseUtil.genJson("Error", e.getMessage()));
+            ResponseUtil.genJson("Success", 200,e,resp);
+
         }
     }
 
@@ -62,7 +65,7 @@ public class CustomerServlet extends HttpServlet {
         String street = req.getParameter("street");
         resp.setContentType("application/json");
 
-        try (Connection connection = customerBO.pool(req).getConnection()) {
+        try (Connection connection = PoolUtil.pool(req).getConnection()) {
 
             customerBO.addCustomer(new CustomerDTO(id, name, mobile, nic, city, street), connection);
 //            PrintWriter writer = resp.getWriter();
@@ -89,10 +92,10 @@ public class CustomerServlet extends HttpServlet {
         String city = jsonObject.getString("city");
         String street = jsonObject.getString("street");
 //        resp.addHeader("Access-Control-Allow-Origin", "*");
-        resp.setContentType("application/json");
+        resp.setContentType("applicatiodn/json");
 
         System.out.println(id + name + mobile + nic + city + street);
-        try (Connection connection = customerBO.pool(req).getConnection();) {
+        try (Connection connection = PoolUtil.pool(req).getConnection();) {
 
             boolean isUpdated = customerBO.updateCustomer(new CustomerDTO(id, name, mobile, nic, city, street), connection);
             if (isUpdated) {
@@ -113,7 +116,7 @@ public class CustomerServlet extends HttpServlet {
         String cusID = req.getParameter("id");
         resp.setContentType("application/json");
         System.out.println(cusID);
-        try (Connection connection = customerBO.pool(req).getConnection();) {
+        try (Connection connection = PoolUtil.pool(req).getConnection();) {
             boolean deleteCustomer = customerBO.deleteCustomer(cusID, connection);
             if (deleteCustomer) {
                 ResponseUtil.genJson("Success", 200, resp);
