@@ -9,6 +9,7 @@ S(window).on('load', function () {
     S("#btn-update-item").prop("disabled", true);
     S("#btn-delete-item").prop("disabled", true);
     loadItemDataTable();
+    setItemDataTableToTextFeild();
 });
 
 function getAllItemForTextFeild() {
@@ -18,6 +19,7 @@ function getAllItemForTextFeild() {
     itemQTY = S('#itemQTY').val();
     itemDescription = S('#itemDescription').val();
 }
+
 S('#btn-save-item').click(function () {
     // if (checkAllItemReg()) {
     //     saveItem();
@@ -28,9 +30,9 @@ S('#btn-save-item').click(function () {
     let data = S('#itemFormData').serialize();
     let id = S('#itemId').val();
     S.ajax({
-        url:"http://localhost:8080/app/item",
-        method:"POST",
-        data:data,
+        url: "http://localhost:8080/app/item",
+        method: "POST",
+        data: data,
         success: function (resp) {
             if (resp.status === 200) {
                 loadItemDataTable();
@@ -42,7 +44,7 @@ S('#btn-save-item').click(function () {
                     showConfirmButton: false,
                     timer: 2500
                 })
-            }else if (resp.status === 500 && resp.data.startsWith("Duplicate entry "+"'"+id+"'")){
+            } else if (resp.status === 500 && resp.data.startsWith("Duplicate entry " + "'" + id + "'")) {
                 Swal.fire({
                     position: 'top-end',
                     icon: 'warning',
@@ -50,7 +52,7 @@ S('#btn-save-item').click(function () {
                     showConfirmButton: false,
                     timer: 2500
                 })
-            }else {
+            } else {
                 Swal.fire({
                     position: 'top-end',
                     icon: 'warning',
@@ -60,7 +62,7 @@ S('#btn-save-item').click(function () {
                 })
             }
         },
-        error:function (resp) {
+        error: function (resp) {
             Swal.fire({
                 position: 'top-end',
                 icon: 'warning',
@@ -129,6 +131,7 @@ function loadItemDataTable() {
             for (var item of resp) {
                 var row = `<tr><td>${item.id}</td><td>${item.description}</td><td>${item.category}</td><td>${item.unitPrice}</td><td>${item.qty}</td></tr>`;
                 S('#tBody-item').append(row)
+                setItemDataTableToTextFeild();
             }
         }
 
@@ -159,13 +162,62 @@ function setItemDataTableToTextFeild() {
         S('#search').val("");
     });
 }
+
 S('#btn-update-item').click(function () {
 
-    if (checkAllItemReg()) {
-        updateItem();
-    } else {
-        alert('error');
+    // if (checkAllItemReg()) {
+    //     updateItem();
+    // } else {
+    //     alert('error');
+    // }
+
+    var itemOB = {
+        itemId: S('#itemId').val(),
+        itemCategory: S('#itemCategory').val(),
+        itemUnitPrice: S('#itemUnitPrice').val(),
+        itemQTY: S('#itemQTY').val(),
+        itemDescription: S('#itemDescription').val(),
     }
+    // let data = S('#formData').serialize();
+    let itemId = S('#itemId').val();
+
+    // console.log(data)
+    S.ajax({
+        url: "http://localhost:8080/app/item",
+        method: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(itemOB),
+        success: function (resp) {
+            if (resp.status === 200) {
+                loadItemDataTable();
+                clearItemInputFields();
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Item has been Updated!',
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+            } else {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'Item Not saved. Please Try Again',
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+            }
+        },
+        error: function (resp) {
+            Swal.fire({
+                position: 'top-end',
+                icon: 'warning',
+                title: 'Item Not saved. Please Try Again',
+                showConfirmButton: false,
+                timer: 2500
+            })
+        }
+    });
 });
 
 function updateItem() {
@@ -223,6 +275,7 @@ function itemRowdoubleClick() {
         S("#btn-update-item").prop("disabled", true);
     });
 }
+
 S('#btn-delete-item').click(function () {
     deleteItem();
 });

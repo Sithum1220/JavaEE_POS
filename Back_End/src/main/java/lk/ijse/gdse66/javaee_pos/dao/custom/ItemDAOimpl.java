@@ -21,7 +21,9 @@ public class ItemDAOimpl implements ItemDAO {
         ArrayList<Item> allItems = new ArrayList();
         ResultSet rst = connection.createStatement().executeQuery("SELECT * FROM item");
         while (rst.next()) {
-            Item item = new Item(rst.getString("id"), rst.getString("item_category"), rst.getString("unit_price"), rst.getString("qty"),rst.getString("item_description"));
+            Item item = new Item(rst.getString("id"), rst.getString("item_category"),
+                    rst.getString("unit_price"), rst.getString("qty"),
+                    rst.getString("item_description"));
             allItems.add(item);
         }
         return allItems;
@@ -29,7 +31,10 @@ public class ItemDAOimpl implements ItemDAO {
 
     @Override
     public boolean update(Item entity, Connection connection) throws SQLException {
-        return false;
+        return connection.createStatement().executeUpdate("UPDATE item SET  item_category='" +
+                entity.getItem_category() + "',unit_price='" + entity.getUnit_price() + "',qty='" +
+                entity.getUnit_price() + "',item_description='"+entity.getItem_description()+"' WHERE " +
+                "id='" + entity.getId() + "'") > 0;
     }
 
     @Override

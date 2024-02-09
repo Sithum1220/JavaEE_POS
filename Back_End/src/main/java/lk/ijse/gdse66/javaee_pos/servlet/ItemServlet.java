@@ -1,8 +1,6 @@
 package lk.ijse.gdse66.javaee_pos.servlet;
 
-import jakarta.json.Json;
-import jakarta.json.JsonArrayBuilder;
-import jakarta.json.JsonObjectBuilder;
+import jakarta.json.*;
 import lk.ijse.gdse66.javaee_pos.bo.BOFactory;
 import lk.ijse.gdse66.javaee_pos.bo.ItemBO;
 import lk.ijse.gdse66.javaee_pos.dto.CustomerDTO;
@@ -78,7 +76,31 @@ public class ItemServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        JsonReader reader = Json.createReader(req.getReader());
+        JsonObject jsonObject = reader.readObject();
+        String id = jsonObject.getString("id");
+        String category = jsonObject.getString("category");
+        String unitPrice = jsonObject.getString("unitPrice");
+        String qty = jsonObject.getString("qty");
+        String description = jsonObject.getString("description");
+//        resp.addHeader("Access-Control-Allow-Origin", "*");
+        resp.setContentType("application/json");
 
+//        System.out.println(id + name + mobile + nic + city + street);
+        try (Connection connection = PoolUtil.pool(req).getConnection();) {
+
+            boolean isUpdated = itemBO.updateItem(new ItemDTO(id, category, unitPrice, qty, description), connection);
+            if (isUpdated) {
+                System.out.println(isUpdated);
+                ResponseUtil.genJson("Success", 200, resp);
+            } else {
+                System.out.println(isUpdated);
+                ResponseUtil.genJson("Error", 500, resp);
+            }
+
+        } catch (SQLException e) {
+            ResponseUtil.genJson("Error", 500, e, resp);
+        }
     }
 
     @Override
