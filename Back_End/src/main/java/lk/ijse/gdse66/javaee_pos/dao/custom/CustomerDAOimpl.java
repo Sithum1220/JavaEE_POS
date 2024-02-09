@@ -43,4 +43,10 @@ public class CustomerDAOimpl implements CustomerDAO {
         return connection.createStatement().executeUpdate("UPDATE customer SET  name='"+entity.getName()+"',mobile='"+entity.getMobile()+"',nic='"+entity.getNic()+"',city='"+entity.getCity()+"',street='"+entity.getStreet()+"' WHERE id='"+entity.getId()+"'")>0;
 
     }
+
+    @Override
+    public boolean delete(String id, Connection connection) throws SQLException {
+        return connection.createStatement().executeUpdate("DELETE FROM customer WHERE id ='"+id+"'")>0;
+
+    }
 }

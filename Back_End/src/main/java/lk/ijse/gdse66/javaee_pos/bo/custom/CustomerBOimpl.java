@@ -48,4 +48,10 @@ public class CustomerBOimpl implements CustomerBO {
         return customerDAO.update(new Customer(dto.getId(), dto.getName(), dto.getMobile(), dto.getNic(), dto.getCity(), dto.getStreet()),connection);
 
     }
+
+    @Override
+    public boolean deleteCustomer(String id, Connection connection) throws SQLException {
+        return customerDAO.delete(id, connection);
+
+    }
 }

@@ -185,6 +185,7 @@ function loadDataTable() {
                 var row = `<tr><td>${customer.id}</td><td>${customer.name}</td><td>${customer.street+", "+customer.city}</td><td>${customer.mobile}</td><td>${customer.nic}</td></tr>`;
                 S('#tBody').append(row)
                 setDataTableToTextFeild();
+                doubleClick();
             }
         }
     })
@@ -303,44 +304,44 @@ S('#btn-update').click(function () {
     });
 });
 
-function updateCustomer() {
-    getAllCustomerForTextFeild();
-    Swal.fire({
-        title: 'Do you want to save the changes?',
-        showDenyButton: true,
-        showCancelButton: true,
-        confirmButtonText: 'Save',
-        denyButtonText: `Don't save`,
-    }).then((result) => {
-        /* Read more about isConfirmed, isDenied below */
-        if (result.isConfirmed) {
-            Swal.fire('Saved!', '', 'success');
-
-            let index = -1;
-
-            for (let customerObj of customerDB) {
-                if (customerObj.id == selectedId) {
-                    index = customerDB.indexOf(customerObj);
-                }
-            }
-
-            customerDB[index].id = customerId;
-            customerDB[index].name = customerName;
-            customerDB[index].address = customerStreet + ", " + customerCity;
-            customerDB[index].mobile = customerMobile;
-            customerDB[index].nic = customerNIC;
-            loadDataTable();
-            clearCustomerInputFields();
-            S('#customerId').prop('disabled', false);
-            setDataTableToTextFeild();
-            doubleClick();
-            S('#search').val("");
-
-        } else if (result.isDenied) {
-            Swal.fire('Changes are not saved', '', 'info')
-        }
-    });
-}
+// function updateCustomer() {
+//     getAllCustomerForTextFeild();
+//     Swal.fire({
+//         title: 'Do you want to save the changes?',
+//         showDenyButton: true,
+//         showCancelButton: true,
+//         confirmButtonText: 'Save',
+//         denyButtonText: `Don't save`,
+//     }).then((result) => {
+//         /* Read more about isConfirmed, isDenied below */
+//         if (result.isConfirmed) {
+//             Swal.fire('Saved!', '', 'success');
+//
+//             let index = -1;
+//
+//             for (let customerObj of customerDB) {
+//                 if (customerObj.id == selectedId) {
+//                     index = customerDB.indexOf(customerObj);
+//                 }
+//             }
+//
+//             customerDB[index].id = customerId;
+//             customerDB[index].name = customerName;
+//             customerDB[index].address = customerStreet + ", " + customerCity;
+//             customerDB[index].mobile = customerMobile;
+//             customerDB[index].nic = customerNIC;
+//             loadDataTable();
+//             clearCustomerInputFields();
+//             S('#customerId').prop('disabled', false);
+//             setDataTableToTextFeild();
+//             doubleClick();
+//             S('#search').val("");
+//
+//         } else if (result.isDenied) {
+//             Swal.fire('Changes are not saved', '', 'info')
+//         }
+//     });
+// }
 
 function disableTextFeild(condition) {
     S('#customerId').prop('disabled', condition);
@@ -361,7 +362,42 @@ function doubleClick() {
 }
 
 S('#btn-delete').click(function () {
-    deleteCustomer();
+    // deleteCustomer();
+    let id = S('#customerId').val();
+    S.ajax({
+        url: "http://localhost:8080/app/customer?id="+id,
+        method:"DELETE",
+        success: function (resp) {
+            if (resp.status === 200) {
+                clearCustomerInputFields();
+                loadDataTable();
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Customer has been Deleted!',
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+            }else {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'Customer Delete Unsuccessful. Please Try Again',
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+            }
+        },
+        error: function (resp) {
+            Swal.fire({
+                position: 'top-end',
+                icon: 'warning',
+                title: 'Customer Delete Unsuccessful. Please Try Again',
+                showConfirmButton: false,
+                timer: 2500
+            })
+        }
+    })
 });
 
 function deleteCustomer() {

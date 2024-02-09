@@ -11,4 +11,6 @@ public interface CrudDAO<T> extends SuperDAO{
 
      public boolean update(T entity, Connection connection) throws SQLException;
 
+     public boolean delete(String id, Connection connection) throws SQLException;
+
 }

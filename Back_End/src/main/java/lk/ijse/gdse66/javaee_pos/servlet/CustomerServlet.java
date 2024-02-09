@@ -43,7 +43,7 @@ public class CustomerServlet extends HttpServlet {
 
             //create the response Object
 //            resp.getWriter().print(ResponseUtil.genJson("Success", "Loaded", allCustomers.build()));
-            ResponseUtil.genJson("Success",200,resp,allCustomers);
+            ResponseUtil.genJson("Success", 200, resp, allCustomers);
 
         } catch (SQLException e) {
             resp.setStatus(500);
@@ -71,7 +71,7 @@ public class CustomerServlet extends HttpServlet {
         } catch (SQLException e) {
 //            PrintWriter writer = resp.getWriter();
 //            writer.print(ResponseUtil.genJson("Error", 500, e).build());
-            ResponseUtil.genJson("Success", 200,e, resp);
+            ResponseUtil.genJson("Success", 200, e, resp);
 
 //            resp.getWriter().print(ResponseUtil.genJson("Error", e.getMessage()));
         }
@@ -91,26 +91,39 @@ public class CustomerServlet extends HttpServlet {
 //        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
 
-        System.out.println(id+name+mobile+nic+city+street);
+        System.out.println(id + name + mobile + nic + city + street);
         try (Connection connection = customerBO.pool(req).getConnection();) {
 
-            boolean isUpdated = customerBO.updateCustomer(new CustomerDTO(id, name, mobile, nic,city,street), connection);
+            boolean isUpdated = customerBO.updateCustomer(new CustomerDTO(id, name, mobile, nic, city, street), connection);
             if (isUpdated) {
                 System.out.println(isUpdated);
-               ResponseUtil.genJson("Success",200,resp);
+                ResponseUtil.genJson("Success", 200, resp);
             } else {
                 System.out.println(isUpdated);
-                ResponseUtil.genJson("Error",500,resp);
+                ResponseUtil.genJson("Error", 500, resp);
             }
 
         } catch (SQLException e) {
-            ResponseUtil.genJson("Error",500,e,resp);
+            ResponseUtil.genJson("Error", 500, e, resp);
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        String cusID = req.getParameter("id");
+        resp.setContentType("application/json");
+        System.out.println(cusID);
+        try (Connection connection = customerBO.pool(req).getConnection();) {
+            boolean deleteCustomer = customerBO.deleteCustomer(cusID, connection);
+            if (deleteCustomer) {
+                ResponseUtil.genJson("Success", 200, resp);
+            } else {
+                ResponseUtil.genJson("Error", 500, resp);
+            }
+        } catch (SQLException e) {
+            ResponseUtil.genJson("Error", 500,e,resp);
+        }
     }
-
 }
+
+
